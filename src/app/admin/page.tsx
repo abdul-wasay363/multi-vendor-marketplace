@@ -218,7 +218,7 @@ export default async function AdminDashboard() {
                   <tr className="border-b border-zinc-200 text-xs uppercase tracking-wider text-zinc-500 font-semibold bg-zinc-50">
                     <th className="py-3 px-6">Order ID</th>
                     <th className="py-3 px-6">Buyer</th>
-                    <th className="py-3 px-6">Status</th>
+                    <th className="py-3 px-6">Payment Status</th>
                     <th className="py-3 px-6 text-right">Total Amount</th>
                   </tr>
                 </thead>
@@ -234,11 +234,19 @@ export default async function AdminDashboard() {
                           <span className="text-xs text-zinc-500">{order.buyer.email}</span>
                         </div>
                       </td>
-                      <td className="py-4 px-6">
-                        <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 border border-green-200">
-                          {order.status}
-                        </span>
-                      </td>
+                      {order.isPaid ? (
+                        <td className="py-4 px-6">
+                          <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 border border-green-200">
+                            Paid
+                          </span>
+                        </td>
+                      ) : (
+                        <td className="py-4 px-6">
+                          <span className="inline-flex items-center rounded-full bg-yellow-50 px-2.5 py-0.5 text-xs font-medium text-yellow-700 border border-yellow-200">
+                            Pending
+                          </span>
+                        </td>
+                      )}
                       <td className="py-4 px-6 font-mono font-bold text-zinc-900 text-right">
                         ${(order.totalAmount / 100).toFixed(2)}
                       </td>
