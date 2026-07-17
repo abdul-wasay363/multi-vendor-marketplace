@@ -100,7 +100,7 @@ export default function CheckoutPage() {
                 <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex gap-3 text-blue-700 text-sm">
                   <ShieldCheck className="h-5 w-5 shrink-0" />
                   <p>
-                    This is a development environment. No real payment will be processed. Clicking 'Pay Now' will instantly generate a test order in your database.
+                    This is a development environment. No real payment will be processed.
                   </p>
                 </div>
               </div>
