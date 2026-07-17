@@ -38,7 +38,6 @@ export function ProductCard({ id, name, price, imageUrl, sellerName, sellerId }:
       id,
       name,
       price,
-      quantity: 1,
       sellerId,
       imageUrl, // <-- ADD THIS LINE!
       sellerName,
