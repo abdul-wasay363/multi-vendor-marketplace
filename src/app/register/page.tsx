@@ -39,7 +39,7 @@ export default function RegisterPage() {
     });
 
     if (error) {
-      setError(error.message);
+      setError(error.message || "An unexpected error occurred. Please try again.");
       setLoading(false);
     } else {
       // Success! Auto-logged in. Route to the homepage.

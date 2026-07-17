@@ -30,7 +30,7 @@ export default function LoginPage() {
     });
 
     if (error) {
-      setError(error.message); // Instantly show the error on screen
+      setError(error.message || "An unexpected error occurred. Please try again."); // Instantly show the error on screen
       setLoading(false);
     } else {
       router.push("/");
