@@ -51,7 +51,7 @@ export default async function Home() {
               </Button>
             </Link>
             {!session && (
-              <Link href="/signup">
+              <Link href="/register">
                 <Button size="lg" variant="outline" className="h-14 px-8 text-base rounded-full border-zinc-300">
                   Become a Seller
                 </Button>
