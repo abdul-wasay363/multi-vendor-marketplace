@@ -70,7 +70,7 @@ export async function Navbar() {
                     Log in
                   </Button>
                 </Link>
-                <Link href="/signup">
+                <Link href="/register">
                   <Button className="font-semibold bg-zinc-900 text-white hover:bg-zinc-800 rounded-full px-6">
                     Sign up
                   </Button>
