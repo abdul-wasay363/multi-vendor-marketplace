@@ -1,0 +1,124 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// 1. The Updated User Model
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  
+  role          String    @default("BUYER") // Can be "BUYER", "SELLER", or "ADMIN"
+  // A user can have many products (if they are a seller)
+  products      Product[] // Leaves your relations perfectly intact!
+  sessions      Session[]
+  accounts      Account[]
+  ordersPurchased Order[]     @relation("BuyerOrders")
+  itemsSold       OrderItem[] @relation("SellerOrderItems")
+}
+
+// 2. The Product Model
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Int      // Stored in cents (e.g., $10.00 = 1000) to avoid math errors
+  imageUrl    String?  // <-- ADD THIS LINE (Optional, so old products don't break!)
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  // Connects this product to a specific User (the seller)
+  sellerId    String
+  // Add onDelete: Cascade to the relation!
+  seller      User     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+}
+
+// 2. Better Auth required tables
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?   @db.Text // Better Auth stores hashed passwords safely here!
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model Verification {
+  id         String    @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+}
+
+// The Master Order (Belongs to the Buyer)
+model Order {
+  id              String      @id @default(cuid())
+  buyerId         String
+  buyer           User        @relation("BuyerOrders", fields: [buyerId], references: [id])
+  totalAmount     Int         // Stored in cents!
+
+  isPaid          Boolean     @default(false) // <-- ADD THIS LINE
+
+  shippingAddress String      @db.Text
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  items           OrderItem[] // Links to the individual products bought
+}
+
+// The Line Items (Belongs to the Order, the Product, AND the Seller)
+model OrderItem {
+  id            String   @id @default(cuid())
+  orderId       String
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status          String      @default("PENDING") // E.g., PENDING, PAID, SHIPPED
+  
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id])
+  
+  // We strictly track the seller so we can build a Sales Dashboard for vendors later!
+  sellerId      String
+  seller        User     @relation("SellerOrderItems", fields: [sellerId], references: [id])
+  
+  quantity      Int
+  priceAtEpoch  Int      // CRITICAL: We save the exact price at the time of purchase in case the vendor changes the price later!
+  createdAt     DateTime @default(now())
+}
